@@ -93,6 +93,8 @@ def tradingIncome(count):
         print("裝箱收益(E):")
         print("交易所買最終材料: ",end='')
         print(round((final_price-total_cost)/10**8,2))
+        print("交易所買原材料: ",end='')
+        print(round((final_price-total_base_cost)/10**8,2))
         print("自產:             ",end='')
         print(round((final_price-total_cost*tax)/10**8,2))
         print('------------------------')
