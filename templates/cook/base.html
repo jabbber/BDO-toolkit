@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='DataTables/datatables.min.css') }}"/>
+  <script type="text/javascript" src="{{ url_for('static',filename='DataTables/datatables.min.js') }}"></script>
+
+  <h1>{% block title %}料理计算器{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+<form method="POST">
+  {{ form.csrf_token }}
+  {{ form.count.label }}
+  {{ form.count(size=20) }}
+{% if form.count.errors %}
+    <ul class="errors">
+    {% for error in form.count.errors %}
+        <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+  {{ form.skill.label }}
+  {{ form.skill(size=20) }}
+{% if form.skill.errors %}
+    <ul class="errors">
+    {% for error in form.skill.errors %}
+        <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+  {{ form.tribute_skill.label }}
+  {{ form.tribute_skill(size=20) }}
+{% if form.tribute_skill.errors %}
+    <ul class="errors">
+    {% for error in form.tribute_skill.errors %}
+        <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+  <input type="submit" value="Go">
+</form>
+
+   <h1>计算结果:</h1>
+  {% block result %}
+  {% endblock %}
+
+{% endblock %}
+

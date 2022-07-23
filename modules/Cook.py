@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 import math
 # get market price and calculate
-from market_api import Market
+from .market_api import Market
+
+SUPPORTS=[
+    '奧迪爾利塔套餐',
+    '醃製蔬菜',
+]
 
 recipe={
     "奧迪爾利塔套餐": {
@@ -42,6 +47,20 @@ recipe={
     "酒的精髓": {
         "material":{"蕎麥粉":1,"草莓":1,"發酵劑":1},
     },
+    "醃製蔬菜": {
+        "material":{"甜椒":8,"醋":4,"發酵劑":2,"砂糖":2},
+        "special":"糖醋醃製蔬菜",
+        "box":["專家",18]
+    },
+    "醋": {
+        "material":{"甜椒":1,"草莓":1,"發酵劑":1,"砂糖":1},
+    },
+}
+
+box_price={
+    '專家': 120000,
+    '名匠': 220000,
+    '道人': 320000,
 }
 
 npc_items='''
@@ -223,14 +242,13 @@ def calMaterial(target,count,skill,tribute_skill,level=0):
         if 'special' in recipe[target]:
             box_count += result['特製']*3/food_count
         result[box+'箱'] = round(box_count,2)
-        # 納貢價格
+
+        # 納貢加成
         skill_point = int(tribute_skill/50)*50
         skill_addition = skill_addition_map[tribute_skill]
-        box_price={
-            '名匠': round(220000*(2.5+skill_addition["皇室納貢增加額外金額"])),
-            '道人': round(320000*(2.5+skill_addition["皇室納貢增加額外金額"])),
-        }
-        result["納貢收入"] = round(box_count*box_price[box])
+        box_addition = 2.5+skill_addition["皇室納貢增加額外金額"]
+
+        result["納貢收入"] = round(box_count*box_price[box]*box_addition)
     result["材料"] = output
     return result
 
@@ -241,10 +259,7 @@ def boxData(target,count,skill,tribute_skill=0):
     # 納貢價格
     skill_point = int(tribute_skill/50)*50
     skill_addition = skill_addition_map[tribute_skill]
-    box_price={
-        '名匠': round(220000*(2.5+skill_addition["皇室納貢增加額外金額"])),
-        '道人': round(320000*(2.5+skill_addition["皇室納貢增加額外金額"])),
-    }
+    box_addition = 2.5+skill_addition["皇室納貢增加額外金額"]
     # 產物數量
     product=productivity(skill,4)
     product5=productivity5(skill)
@@ -257,7 +272,7 @@ def boxData(target,count,skill,tribute_skill=0):
 
     # 反推料理次數
     box,food_count = recipe[target]['box']
-    total_price = round(box_price[box]*count,2)
+    total_price = round(box_price[box]*box_addition*count,2)
     cook_count = round(count*food_count/product_count)
 
     data = calMaterial(target,cook_count,skill,tribute_skill)
