@@ -32,6 +32,6 @@ def create_app(test_config=None):
     from . import toolkit
     app.register_blueprint(toolkit.bp)
 
-    app.add_url_rule('/toolkit',endpoint='toolkit.cook')
+    app.add_url_rule('/',endpoint='toolkit.cook')
 
     return app

@@ -3,6 +3,7 @@
   <head>
     {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block require %}{% endblock %}
     <title>{% block title %}{% endblock %} - BDO-toolkit</title>
     {% endblock %}
   </head>

@@ -49,7 +49,7 @@ recipe={
     },
     "醃製蔬菜": {
         "material":{"甜椒":8,"醋":4,"發酵劑":2,"砂糖":2},
-        "special":"糖醋醃製蔬菜",
+        "special":"糖醋醃蔬菜",
         "box":["專家",18]
     },
     "醋": {
@@ -229,7 +229,6 @@ def calMaterial(target,count,skill,tribute_skill,level=0):
         "料理次數":count,
         "普通": round(product*count,2),
     }
-    price = price_data[target]['BasePrice']
     if 'special' in recipe[target]:
         result["特製"] = round(special*count,2)
     ""
@@ -253,6 +252,9 @@ def calMaterial(target,count,skill,tribute_skill,level=0):
     return result
 
 def boxData(target,count,skill,tribute_skill=0):
+    market_api = Market()
+    price_data = market_api.priceData('TW-tw')
+
     if not tribute_skill:
         tribute_skill=skill
 
@@ -286,13 +288,17 @@ def boxData(target,count,skill,tribute_skill=0):
         "納貢收入": counter(data,'納貢收入')['總計'],
         "成本": counter(data,'價格',skip_mid=True)['總計'],
     }
+    box_data["總利潤"] = round((box_data['納貢收入'] - box_data['成本']))
     box_data["單箱利潤"] = round((box_data['納貢收入'] - box_data['成本'])/count)
+    buy_price = price_data[recipe[target]['special']]['BasePrice']*food_count/3
+    box_data["買入裝箱利潤"] = round(box_price[box]*box_addition-buy_price)
     final_cook_count = counter(data,'料理次數')["總計"]
     box_data['消耗耐久'] = round(durability(final_cook_count,skill),2)
     box_data['耗時(分)'] = round(box_data['消耗耐久']*1.2/60)
     box_data['魔女湯'] = round(soup(final_cook_count),2)
     box_data["材料"] = counter(data,'數量',skip_mid=True)
     box_data["材料成本"] = counter(data,'價格',skip_mid=True)
+    box_data["材料單價"] = counter(data,'單價',skip_mid=True)
     box_data["生產明細"] = data
 
     return box_data

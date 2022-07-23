@@ -1,7 +1,44 @@
 {% extends 'cook/base.html' %}
 
+{% block scripts %}
+  <script>
+    $(document).ready(function () {
+        $('#result').DataTable();
+    });
+  </script>
+{% endblock %}
+
 {% block result %}
 
-<pre>{{ data }}</pre>
+   <h1>计算结果:</h1>
+
+<table id="result" class="display" style="width:100%">
+  <thead>
+    <tr>
+      <th>名称</th>
+      {% for item in data_title %}
+      <th>{{ item }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for key,value in data.items() %}
+    <tr>
+      <td><a href="{{ url_for('toolkit.cookDetail',name=key) }}">{{ key }}</a></td>
+      {% for item in data_title %}
+      <td>{{ value[item] }}</td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <th>名称</th>
+      {% for item in data_title %}
+      <th>{{ item }}</th>
+      {% endfor %}
+    </tr>
+  </tfoot>
+</table>
 
 {% endblock %}

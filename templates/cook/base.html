@@ -1,14 +1,17 @@
-{% extends 'base.html' %}
+{% extends 'layout.html' %}
 
-{% block header %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='DataTables/datatables.min.css') }}"/>
-  <script type="text/javascript" src="{{ url_for('static',filename='DataTables/datatables.min.js') }}"></script>
+{% block require %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='DataTables/css/jquery.dataTables.min.css') }}"/>
 
-  <h1>{% block title %}料理计算器{% endblock %}</h1>
+  <script type="text/javascript" src="{{ url_for('static',filename='jquery-3.5.1.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static',filename='DataTables/js/jquery.dataTables.min.js') }}"></script>
+  {% block scripts %}{% endblock %}
 {% endblock %}
+  
+
+  {% block title %}料理计算器{% endblock %}
 
 {% block content %}
-
 <form method="POST">
   {{ form.csrf_token }}
   {{ form.count.label }}
@@ -38,12 +41,11 @@
     {% endfor %}
     </ul>
 {% endif %}
-  <input type="submit" value="Go">
+  <input type="submit" value="肘！">
 </form>
 
-   <h1>计算结果:</h1>
-  {% block result %}
-  {% endblock %}
+   {% block result %}
+   {% endblock %}
 
 {% endblock %}
 
