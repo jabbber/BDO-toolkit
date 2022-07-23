@@ -5,6 +5,8 @@ from .market_api import Market
 
 SUPPORTS=[
     '奧迪爾利塔套餐',
+    '巴雷諾斯套餐',
+    '巴洛斯便當',
     '醃製蔬菜',
 ]
 
@@ -54,6 +56,57 @@ recipe={
     },
     "醋": {
         "material":{"甜椒":1,"草莓":1,"發酵劑":1,"砂糖":1},
+    },
+    "巴雷諾斯套餐":{
+        "material":{"起司焗烤":1,"肉丸子":1,"煙燻魚排":1,"炒青菜":2,"啤酒":2},
+        "box":["道人",24],
+        "special":"特製巴雷諾斯套餐",
+    },
+    "起司焗烤":{
+        "material":{"烤香腸":1,"蕎麥粉麵團":5,"甜椒":4,"起司":3,"紅醬":3},
+        "box":["名匠",18],
+        "special":"有嚼勁的起司焗烤",
+    },
+    "肉丸子":{
+        "material":{"鹿肉":8,"蕎麥粉":5,"雞蛋":2,"起司":2,"油炸用油":3},
+        "box":["名匠",18],
+        "special":"酥脆肉丸子",
+    },
+    "烤香腸":{
+        "material":{"鹿肉":6,"洋蔥":1,"胡椒":2,"鹽":2},
+        "special":"煙燻香腸",
+    },
+    "煙燻魚排":{
+        "material":{"飛魚乾":1,"橄欖油":1,"鹽":2},
+        "special":"特製煙燻魚排",
+    },
+    "炒青菜":{
+        "material":{"甜椒":5,"特等辣椒":1,"橄欖油":2,"鹽":1},
+        "special":"清脆的炒青菜",
+    },
+    "啤酒":{
+        "material":{"蕎麥":5,"料理用飲用水":6,"砂糖":1,"發酵劑":2},
+        "special":"清涼生啤酒",
+    },
+    "巴洛斯便當":{
+        "material":{"艾亦爾三明治":2,"柚子果汁":2,"柚子糖":2},
+        "box":["道人",27],
+    },
+    "艾亦爾三明治":{
+        "material":{"特等柚子":1,"鬆軟的麵包":2,"雞蛋":4,"甜椒":5},
+        "special":"高級艾亦爾三明治",
+    },
+    "鬆軟的麵包":{
+        "material":{"蕎麥粉麵團":6,"發酵劑":2,"雞蛋":4,"牛奶":3},
+        "special":"濕潤的牛奶麵包",
+    },
+    "柚子果汁":{
+        "material":{"特等柚子":1,"砂糖":3,"料理用飲用水":5,"食用蜂蜜":1},
+        "special":"甜蜜的柚子果汁",
+    },
+    "柚子糖":{
+        "material":{"柚子":1,"黑糖":1,"食用蜂蜜":1},
+        "special":"酸甜的柚子糖",
     },
 }
 
@@ -290,7 +343,9 @@ def boxData(target,count,skill,tribute_skill=0):
     }
     box_data["總利潤"] = round((box_data['納貢收入'] - box_data['成本']))
     box_data["單箱利潤"] = round((box_data['納貢收入'] - box_data['成本'])/count)
-    buy_price = price_data[recipe[target]['special']]['BasePrice']*food_count/3
+    buy_price = price_data[target]['BasePrice']*food_count
+    if 'special' in recipe[target]:
+        buy_price = price_data[recipe[target]['special']]['BasePrice']*food_count/3
     box_data["買入裝箱利潤"] = round(box_price[box]*box_addition-buy_price)
     final_cook_count = counter(data,'料理次數')["總計"]
     box_data['消耗耐久'] = round(durability(final_cook_count,skill),2)

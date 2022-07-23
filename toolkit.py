@@ -19,7 +19,7 @@ class CookForm(FlaskForm):
 @bp.route('/', methods=('GET', 'POST'))
 def cook():
     form = CookForm()
-    data_title = ["總利潤","單箱利潤","耗時(分)","買入裝箱利潤","魔女湯"]
+    data_title = ["納貢收入","成本","總利潤","單箱利潤","耗時(分)","買入裝箱利潤","魔女湯"]
     if request.method == 'POST':
         if form.validate_on_submit():
             data = {}
@@ -70,7 +70,7 @@ def cookDetail(name):
         if formdata:
             form.validate()
     box_data = Cook.boxData(name,form.count.data,form.skill.data,form.tribute_skill.data)
-    data_title = ["數量","單價","價格","料理次數","普通","特製","名匠箱","納貢收入"]
+    data_title = ["數量","料理次數","單價","價格","普通","特製","名匠箱","納貢收入"]
     data = cookTable(name,box_data["生產明細"]['材料'],data_title)
 
     total = []
