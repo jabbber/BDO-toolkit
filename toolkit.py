@@ -9,7 +9,7 @@ from .modules import Cook
 
 import json
 
-bp = Blueprint('toolkit', __name__, url_prefix='/')
+bp = Blueprint('toolkit', __name__, url_prefix='/toolkit')
 
 class CookForm(FlaskForm):
     count = fields.IntegerField('目标箱数', [validators.NumberRange(1,10000,"差不多得了啊，只能输入%(min)-%(max)"),],default=200)
