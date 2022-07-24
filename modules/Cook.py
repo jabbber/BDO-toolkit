@@ -190,10 +190,16 @@ def calMaterial(target,count,skill,tribute_skill,parent=""):
         # 只有第0層普通產物可以裝箱，其他普通產物需要當材料
         if not parent:
             box_count = base_info['普通']/food_count
+        # 次級料理如果上級需要1個，且定義了裝箱信息，則進行裝箱，不用來料理
         if 'special' in recipe[target]:
-            box_count += base_info['特製']*3/food_count
-        base_info['裝箱數'] = round(box_count,2)
-        base_info['等級'] = box
+            if not parent:
+                box_count += base_info['特製']*3/food_count
+            else:
+                if recipe[parent]['material'][target] == 1:
+                    box_count += base_info['特製']*3/food_count
+        if box_count > 0:
+            base_info['裝箱數'] = round(box_count,2)
+            base_info['等級'] = box
 
         # 納貢加成
         skill_point = int(tribute_skill/50)*50
@@ -209,7 +215,7 @@ def calMaterial(target,count,skill,tribute_skill,parent=""):
         if item in recipe:
             # 反推需要多少次料理
             cook_rate = product/material[item]
-            if not 'box' in recipe[item] and 'special' in recipe[item]:
+            if ( not 'box' in recipe[item] or material[item] > 1 ) and 'special' in recipe[item]:
                 # 特製可以代替3普通做材料,所以消耗量是除以3取整
                 cook_rate += special/math.ceil(material[item]/3)
             cook_count = round(count/cook_rate)
@@ -259,8 +265,12 @@ def boxData(target,count,skill,tribute_skill=0):
     box_data["總利潤"] = round((box_data['納貢收入'] - box_data['成本']))
     box_data["單箱利潤"] = round((box_data['納貢收入'] - box_data['成本'])/count)
     buy_price = price_data[target]['BasePrice']*food_count
+    box_data["成品登記數量"] = price_data[target]['Count']
+    box_data["成品日交易"] = price_data[target]['DailyVolume']
     if 'special' in recipe[target]:
         buy_price = price_data[recipe[target]['special']]['BasePrice']*food_count/3
+        box_data["特製登記數量"] = price_data[recipe[target]['special']]['Count']
+        box_data["特製日交易"] = price_data[recipe[target]['special']]['DailyVolume']
     box_data["買入裝箱利潤"] = round(box_price[box]*box_addition-buy_price)
     final_cook_count = counter(data,'料理次數')["總計"]
     box_data['消耗耐久'] = round(durability(final_cook_count,skill),2)
@@ -296,7 +306,7 @@ def counter(data,key,sub=False,skip_child=True,total=True,sub_total=True):
         total_count = 0
         for i in out:
             total_count += out[i]
-        out['總計'] = total_count
+        out['總計'] = round(total_count,2)
     return out
 
 if __name__ == '__main__':

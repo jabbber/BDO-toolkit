@@ -318,6 +318,7 @@
   - 名匠
   - 15
 瘦肉沙拉:
+  support: True
   material:
     狼肉: 1
     醋: 2

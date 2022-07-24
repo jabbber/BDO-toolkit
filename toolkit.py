@@ -25,7 +25,7 @@ class CookForm(FlaskForm):
 @bp.route('/', methods=('GET', 'POST'))
 def cook():
     form = CookForm()
-    data_title = ["納貢收入","成本","總利潤","單箱利潤","耗時(分)","買入裝箱利潤","魔女湯"]
+    data_title = ["納貢收入","成本","總利潤","單箱利潤","耗時(分)","魔女湯","買入裝箱利潤","成品登記數量","成品日交易","特製登記數量","特製日交易"]
     if request.method == 'POST':
         if form.validate_on_submit():
             data = {}
@@ -33,7 +33,7 @@ def cook():
             for target in Cook.recipe:
                 if Cook.recipe[target].get('support'):
                     box_data[target] = Cook.boxData(target,form.count.data,form.skill.data,form.tribute_skill.data)
-                    data[target] = {title:box_data[target][title] for title in data_title}
+                    data[target] = {title:box_data[target].get(title,'') for title in data_title}
         else:
             redirect(url_for('toolkit.cookSubmit'))
 
