@@ -2,10 +2,13 @@ import os
 
 from flask import Flask
 
-
 def create_app(test_config=None):
     # create and configure the app
-    app = Flask(__name__, instance_relative_config=True,static_url_path='/toolkit/static')
+    if os.getenv('FLASK_ENV') == 'development':
+        url_path = '/develop'
+    else:
+        url_path = '/toolkit'
+    app = Flask(__name__, instance_relative_config=True,static_url_path=url_path+'/static')
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),

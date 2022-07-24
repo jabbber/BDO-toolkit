@@ -8,8 +8,14 @@ from wtforms import fields,validators
 from .modules import Cook
 
 import json
+import os
 
-bp = Blueprint('toolkit', __name__, url_prefix='/toolkit')
+if os.getenv('FLASK_ENV') == 'development':
+    url_path = '/develop'
+else:
+    url_path = '/toolkit'
+
+bp = Blueprint('toolkit', __name__, url_prefix=url_path)
 
 class CookForm(FlaskForm):
     count = fields.IntegerField('目标箱数', [validators.NumberRange(1,10000,"差不多得了啊，只能输入%(min)-%(max)"),],default=200)
