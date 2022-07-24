@@ -1,114 +1,18 @@
 #!/usr/bin/env python3
 import math
+import pathlib
+import os.path
+import yaml
+#import yaml
 # get market price and calculate
-from .market_api import Market
+from market_api import Market
 
-SUPPORTS=[
-    '奧迪爾利塔套餐',
-    '巴雷諾斯套餐',
-    '巴洛斯便當',
-    '醃製蔬菜',
-]
-
-recipe={
-    "奧迪爾利塔套餐": {
-        "material":{"戴羅提亞布丁":1,"蕨菜炒肉":1,"戴羅提亞果汁":2,"雞胸肉沙拉":2,"炒雞肉":2},
-        "special":"特製奧迪爾利塔套餐",
-        "box":["道人",15],
-    },
-    "戴羅提亞布丁": {
-        "material":{"特等戴羅提亞":1,"犀牛血":7,"蜂蜜酒":2,"燕麥片":1,"純水":3},
-        "special":"戴羅提亞血色布丁",
-        "box":["名匠",18],
-    },
-    "蕨菜炒肉": {
-        "material":{"蕨菜":3,"鹿肉":6,"特等蒜頭":1,"橄欖油":2,"料理用飲用水":5},
-        "special":"清淡的蕨菜炒肉",
-        "box":["名匠",18],
-    },
-    "戴羅提亞果汁": {
-        "material":{"特等戴羅提亞":1,"草莓":5,"砂糖":3,"純水":3},
-        "special":"清涼的戴羅提亞果汁",
-    },
-    "雞胸肉沙拉": {
-        "material":{"雞肉":5,"草莓":5,"甜椒":5,"醋":1,"料理用紅酒":2},
-        "special":"新鮮的雞胸肉沙拉",
-    },
-    "炒雞肉": {
-        "material":{"雞肉":5,"蕎麥":5,"特等洋蔥":1,"橄欖油":2},
-        "special":"香香的炒雞肉"
-    },
-    "蜂蜜酒": {
-        "material":{"食用蜂蜜":3,"酒的精髓":2,"料理用飲用水":6,"砂糖":2},
-        "special":"刺激的蜂蜜酒"
-    },
-    "燕麥片": {
-        "material":{"蕎麥粉":9,"牛奶":3,"食用蜂蜜":2,"特等洋蔥":1},
-        "special":"精製的燕麥片",
-    },
-    "酒的精髓": {
-        "material":{"蕎麥粉":1,"草莓":1,"發酵劑":1},
-    },
-    "醃製蔬菜": {
-        "material":{"甜椒":8,"醋":4,"發酵劑":2,"砂糖":2},
-        "special":"糖醋醃蔬菜",
-        "box":["專家",18]
-    },
-    "醋": {
-        "material":{"甜椒":1,"草莓":1,"發酵劑":1,"砂糖":1},
-    },
-    "巴雷諾斯套餐":{
-        "material":{"起司焗烤":1,"肉丸子":1,"煙燻魚排":1,"炒青菜":2,"啤酒":2},
-        "box":["道人",24],
-        "special":"特製巴雷諾斯套餐",
-    },
-    "起司焗烤":{
-        "material":{"烤香腸":1,"蕎麥粉麵團":5,"甜椒":4,"起司":3,"紅醬":3},
-        "box":["名匠",18],
-        "special":"有嚼勁的起司焗烤",
-    },
-    "肉丸子":{
-        "material":{"鹿肉":8,"蕎麥粉":5,"雞蛋":2,"起司":2,"油炸用油":3},
-        "box":["名匠",18],
-        "special":"酥脆肉丸子",
-    },
-    "烤香腸":{
-        "material":{"鹿肉":6,"洋蔥":1,"胡椒":2,"鹽":2},
-        "special":"煙燻香腸",
-    },
-    "煙燻魚排":{
-        "material":{"飛魚乾":1,"橄欖油":1,"鹽":2},
-        "special":"特製煙燻魚排",
-    },
-    "炒青菜":{
-        "material":{"甜椒":5,"特等辣椒":1,"橄欖油":2,"鹽":1},
-        "special":"清脆的炒青菜",
-    },
-    "啤酒":{
-        "material":{"蕎麥":5,"料理用飲用水":6,"砂糖":1,"發酵劑":2},
-        "special":"清涼生啤酒",
-    },
-    "巴洛斯便當":{
-        "material":{"艾亦爾三明治":2,"柚子果汁":2,"柚子糖":2},
-        "box":["道人",27],
-    },
-    "艾亦爾三明治":{
-        "material":{"特等柚子":1,"鬆軟的麵包":2,"雞蛋":4,"甜椒":5},
-        "special":"高級艾亦爾三明治",
-    },
-    "鬆軟的麵包":{
-        "material":{"蕎麥粉麵團":6,"發酵劑":2,"雞蛋":4,"牛奶":3},
-        "special":"濕潤的牛奶麵包",
-    },
-    "柚子果汁":{
-        "material":{"特等柚子":1,"砂糖":3,"料理用飲用水":5,"食用蜂蜜":1},
-        "special":"甜蜜的柚子果汁",
-    },
-    "柚子糖":{
-        "material":{"柚子":1,"黑糖":1,"食用蜂蜜":1},
-        "special":"酸甜的柚子糖",
-    },
-}
+def recipe():
+    current_dir = pathlib.Path(__file__).parent.resolve()
+    recipe_meta = os.path.join(current_dir,'recipe.yaml')
+    with open(recipe_meta, "r") as stream:
+        recipe_data = yaml.safe_load(stream)
+    return recipe_data
 
 box_price={
     '專家': 120000,
@@ -249,7 +153,7 @@ def calMaterial(target,count,skill,tribute_skill,level=0):
 
     market_api = Market()
     price_data = market_api.priceData('TW-tw')
-    material = recipe[target]['material']
+    material = recipe()[target]['material']
     output = {}
     for item in material:
         #單次材料數量
@@ -266,10 +170,10 @@ def calMaterial(target,count,skill,tribute_skill,level=0):
         }
 
         #次級料理
-        if item in recipe:
+        if item in recipe():
             # 反推需要多少次料理
             cook_rate = product/material[item]
-            if not 'box' in recipe[item]:
+            if not 'box' in recipe()[item]:
                 # 特製可以代替3普通做材料,所以消耗量是除以3取整
                 cook_rate += special/math.ceil(material[item]/3)
             cook_count = round(count/cook_rate)
@@ -282,16 +186,16 @@ def calMaterial(target,count,skill,tribute_skill,level=0):
         "料理次數":count,
         "普通": round(product*count,2),
     }
-    if 'special' in recipe[target]:
+    if 'special' in recipe()[target]:
         result["特製"] = round(special*count,2)
     ""
-    if 'box' in recipe[target]:
-        box,food_count = recipe[target]['box']
+    if 'box' in recipe()[target]:
+        box,food_count = recipe()[target]['box']
         box_count = 0
         # 只有第0層普通產物可以裝箱，其他普通產物需要當材料
         if level == 0:
             box_count = result['普通']/food_count
-        if 'special' in recipe[target]:
+        if 'special' in recipe()[target]:
             box_count += result['特製']*3/food_count
         result[box+'箱'] = round(box_count,2)
 
@@ -322,11 +226,11 @@ def boxData(target,count,skill,tribute_skill=0):
 
     # 單次料理產量
     product_count = product
-    if 'special'in recipe[target]:
+    if 'special'in recipe()[target]:
         product_count = product+special*3
 
     # 反推料理次數
-    box,food_count = recipe[target]['box']
+    box,food_count = recipe()[target]['box']
     total_price = round(box_price[box]*box_addition*count,2)
     cook_count = round(count*food_count/product_count)
 
@@ -344,8 +248,8 @@ def boxData(target,count,skill,tribute_skill=0):
     box_data["總利潤"] = round((box_data['納貢收入'] - box_data['成本']))
     box_data["單箱利潤"] = round((box_data['納貢收入'] - box_data['成本'])/count)
     buy_price = price_data[target]['BasePrice']*food_count
-    if 'special' in recipe[target]:
-        buy_price = price_data[recipe[target]['special']]['BasePrice']*food_count/3
+    if 'special' in recipe()[target]:
+        buy_price = price_data[recipe()[target]['special']]['BasePrice']*food_count/3
     box_data["買入裝箱利潤"] = round(box_price[box]*box_addition-buy_price)
     final_cook_count = counter(data,'料理次數')["總計"]
     box_data['消耗耐久'] = round(durability(final_cook_count,skill),2)
@@ -388,5 +292,5 @@ def counter(data,key,target='main',skip_mid=False,total=True):
     return out
 
 if __name__ == '__main__':
-    import yaml
-    print(yaml.dump(boxData("奧迪爾利塔套餐",204*30,1200,1400),allow_unicode=True,sort_keys=False))
+    #print(yaml.dump(boxData("奧迪爾利塔套餐",204*30,1200,1400),allow_unicode=True,sort_keys=False))
+    print(yaml.dump(recipe(),allow_unicode=True))
