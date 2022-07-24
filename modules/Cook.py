@@ -147,7 +147,7 @@ for line in npc_items.split('\n'):
     key,value = line.split(' ')
     npc_item_price[key] = int(value)
 
-def calMaterial(target,count,skill,tribute_skill,level=0):
+def calMaterial(target,count,skill,tribute_skill,parent=""):
     # 產物數量
     product=productivity(skill,4)
     product5=productivity5(skill)
@@ -157,6 +157,7 @@ def calMaterial(target,count,skill,tribute_skill,level=0):
     price_data = market_api.priceData('TW-tw')
     material = recipe[target]['material']
     output = {}
+    result = []
     for item in material:
         #單次材料數量
         item_count = count*material[item]
@@ -170,7 +171,40 @@ def calMaterial(target,count,skill,tribute_skill,level=0):
             "單價":item_price,
             "價格":item_price*item_count,
         }
+        if not item in npc_item_price:
+            output[item]["登記數量"] = price_data[item]['Count']
+            output[item]["日交易"] = price_data[item]['DailyVolume']
 
+    base_info = {
+        "料理":target,
+        "料理次數":count,
+        "上級料理":parent,
+        "普通": round(product*count,2),
+    }
+    if 'special' in recipe[target]:
+        base_info["特製"] = round(special*count,2)
+    ""
+    if 'box' in recipe[target]:
+        box,food_count = recipe[target]['box']
+        box_count = 0
+        # 只有第0層普通產物可以裝箱，其他普通產物需要當材料
+        if not parent:
+            box_count = base_info['普通']/food_count
+        if 'special' in recipe[target]:
+            box_count += base_info['特製']*3/food_count
+        base_info['裝箱數'] = round(box_count,2)
+        base_info['等級'] = box
+
+        # 納貢加成
+        skill_point = int(tribute_skill/50)*50
+        skill_addition = skill_addition_map[skill_point]
+        box_addition = 2.5+skill_addition["皇室納貢增加額外金額"]
+
+        base_info["納貢收入"] = round(box_count*box_price[box]*box_addition)
+    base_info["材料"] = output
+
+    result.append(base_info)
+    for item in material:
         #次級料理
         if item in recipe:
             # 反推需要多少次料理
@@ -179,35 +213,10 @@ def calMaterial(target,count,skill,tribute_skill,level=0):
                 # 特製可以代替3普通做材料,所以消耗量是除以3取整
                 cook_rate += special/math.ceil(material[item]/3)
             cook_count = round(count/cook_rate)
-
             
             #迭代計算
-            output[item].update(calMaterial(item,cook_count,skill,tribute_skill,level=level+1))
+            result += calMaterial(item,cook_count,skill,tribute_skill,parent=target)
 
-    result = {
-        "料理次數":count,
-        "普通": round(product*count,2),
-    }
-    if 'special' in recipe[target]:
-        result["特製"] = round(special*count,2)
-    ""
-    if 'box' in recipe[target]:
-        box,food_count = recipe[target]['box']
-        box_count = 0
-        # 只有第0層普通產物可以裝箱，其他普通產物需要當材料
-        if level == 0:
-            box_count = result['普通']/food_count
-        if 'special' in recipe[target]:
-            box_count += result['特製']*3/food_count
-        result[box+'箱'] = round(box_count,2)
-
-        # 納貢加成
-        skill_point = int(tribute_skill/50)*50
-        skill_addition = skill_addition_map[skill_point]
-        box_addition = 2.5+skill_addition["皇室納貢增加額外金額"]
-
-        result["納貢收入"] = round(box_count*box_price[box]*box_addition)
-    result["材料"] = output
     return result
 
 def boxData(target,count,skill,tribute_skill=0):
@@ -237,15 +246,15 @@ def boxData(target,count,skill,tribute_skill=0):
     cook_count = round(count*food_count/product_count)
 
     data = calMaterial(target,cook_count,skill,tribute_skill)
+
     box_data = {
         "料理": target,
         "熟練度": skill,
         "納貢熟練度": tribute_skill,
         "目標箱數": count,
-        "道人箱": counter(data,'道人箱')['總計'],
-        "名匠箱": counter(data,'名匠箱')['總計'],
+        "實際箱數": '|'.join(["{}({})".format(key,value) for key,value in counter(data,'裝箱數').items()]),
         "納貢收入": counter(data,'納貢收入')['總計'],
-        "成本": counter(data,'價格',skip_mid=True)['總計'],
+        "成本": counter(data,'價格',sub=True)['總計'],
     }
     box_data["總利潤"] = round((box_data['納貢收入'] - box_data['成本']))
     box_data["單箱利潤"] = round((box_data['納貢收入'] - box_data['成本'])/count)
@@ -257,47 +266,38 @@ def boxData(target,count,skill,tribute_skill=0):
     box_data['消耗耐久'] = round(durability(final_cook_count,skill),2)
     box_data['耗時(分)'] = round(box_data['消耗耐久']*1.2/60)
     box_data['魔女湯'] = round(soup(final_cook_count),2)
-    box_data["材料"] = counter(data,'數量',skip_mid=True)
-    box_data["材料成本"] = counter(data,'價格',skip_mid=True)
-    box_data["材料單價"] = counter(data,'單價',skip_mid=True,sub_total=False)
+    box_data["需求量"] = counter(data,'數量',total=False,sub=True,sub_total=True)
+    box_data["價格"] = counter(data,'價格',sub=True,sub_total=True)
+    box_data["單價"] = counter(data,'單價',total=False,sub=True,sub_total=False)
+    box_data["登記數量"] = counter(data,'登記數量',total=False,sub=True,sub_total=False)
+    box_data["日交易"] = counter(data,'日交易',total=False,sub=True,sub_total=False)
     box_data["生產明細"] = data
 
     return box_data
 
-def counter(data,key,target='main',skip_mid=False,total=True,sub_total=True):
-    # skip_mid 不累計迭代項
+def counter(data,key,sub=False,skip_child=True,total=True,sub_total=True):
+    # skip_child 不累計中間產物
     # sub_total 不累計數量
     out = {}
-    if total:
-        out["總計"] = 0
-    if target and '材料' in data and not skip_mid:
-        if key in data:
-            out[target] = data[key]
-    for item in data["材料"]:
-        value = data["材料"][item]
-        if "材料" in value:
-            mid_out = counter(value,key,target='',skip_mid=skip_mid,total=False,sub_total=sub_total)
-            for mid_key in mid_out:
-                if mid_key == "總計":
+    for line in data:
+        if not sub and key in line:
+            out[line['料理']] = line[key]
+        else:
+            for item in line["材料"]:
+                if skip_child and item in recipe:
                     continue
-                if not mid_key in out:
-                    out[mid_key] = 0
-                if sub_total:
-                    out[mid_key] += mid_out[mid_key]
-                else:
-                    out[mid_key] = mid_out[mid_key]
-            if skip_mid:
-                continue
-        if key in value:
-            out[item] = value[key]
+                if key in line["材料"][item]:
+                    value = line["材料"][item][key]
+                    if not item in out:
+                        out[item] = value
+                    elif sub_total:
+                        out[item] += value
     if total:
-        out["總計"] = 0
-        for key in out:
-            if key == "總計":
-                continue
-            out["總計"] += out[key]
+        total_count = 0
+        for i in out:
+            total_count += out[i]
+        out['總計'] = total_count
     return out
 
 if __name__ == '__main__':
-    #print(yaml.dump(boxData("奧迪爾利塔套餐",204*30,1200,1400),allow_unicode=True,sort_keys=False))
-    print(yaml.dump(recipe,allow_unicode=True))
+    print(yaml.dump(boxData("奧迪爾利塔套餐",1000,1200,1400),allow_unicode=True,sort_keys=False))

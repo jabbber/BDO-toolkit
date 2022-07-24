@@ -4,11 +4,49 @@
   <style type="text/css">
   div.container {width: 80%;}
   .float{float: left;}
+
+tr.group,
+tr.group:hover {
+    background-color: #ddd !important;
+}
   </style>
   <script>
-     $(document).ready(function () {
-         $('table.display').DataTable();
-     });
+$(document).ready(function () {
+    var groupColumn = 0;
+    var table = $('.display').DataTable({
+        columnDefs: [{ visible: false, targets: groupColumn }],
+        order: [[groupColumn, 'asc']],
+        displayLength: 10,
+        drawCallback: function (settings) {
+            var api = this.api();
+            var rows = api.rows({ page: 'current' }).nodes();
+            var last = null;
+ 
+            api
+                .column(groupColumn, { page: 'current' })
+                .data()
+                .each(function (group, i) {
+                    if (last !== group) {
+                        $(rows)
+                            .eq(i)
+                            .before('<tr class="group"><td colspan="5">' + group + '</td></tr>');
+ 
+                        last = group;
+                    }
+                });
+        },
+    });
+ 
+    // Order by the grouping
+    $('.display tbody').on('click', 'tr.group', function () {
+        var currentOrder = table.order()[0];
+        if (currentOrder[0] === groupColumn && currentOrder[1] === 'asc') {
+            table.order([groupColumn, 'desc']).draw();
+        } else {
+            table.order([groupColumn, 'asc']).draw();
+        }
+    });
+});
   </script>
 {% endblock %}
 
@@ -38,10 +76,11 @@
 <table id="total" class="display" style="width:100%">
   <thead>
     <tr>
+      <th>類型</th>
       <th>材料</th>
-      <th>數量</th>
-      <th>單價</th>
-      <th>價格</th>
+      {% for item in total_title %}
+      <th>{{ item }}</th>
+      {% endfor %}
     </tr>
   </thead>
   <tbody>
@@ -55,21 +94,22 @@
   </tbody>
   <tfoot>
     <tr>
+      <th>類型</th>
       <th>材料</th>
-      <th>單價</th>
-      <th>價格</th>
+      {% for item in total_title %}
+      <th>{{ item }}</th>
+      {% endfor %}
     </tr>
   </tfoot>
 </table>
 </div>
 
-<div>
-<h2>中间产物明细</h2>
+<div style="width:100%">
+<h2>料理明細</h2>
+<p>料理時推薦按字母順序從大到小製作</p>
 <table id="data" class="display" style="width:100%">
   <thead>
     <tr>
-      <th>料理</th>
-      <th>材料</th>
       {% for item in data_title %}
       <th>{{ item }}</th>
       {% endfor %}
@@ -86,8 +126,6 @@
   </tbody>
   <tfoot>
     <tr>
-      <th>料理</th>
-      <th>材料</th>
       {% for item in data_title %}
       <th>{{ item }}</th>
       {% endfor %}

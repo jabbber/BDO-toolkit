@@ -78,32 +78,48 @@ def cookDetail(name):
         if formdata:
             form.validate()
     box_data = Cook.boxData(name,form.count.data,form.skill.data,form.tribute_skill.data)
-    data_title = ["數量","料理次數","單價","價格","普通","特製","名匠箱","納貢收入"]
-    data = cookTable(name,box_data["生產明細"]['材料'],data_title)
+    data = cookTable(box_data["生產明細"])
+    data_title = ["料理","材料","數量"]
 
     total = []
-    for item in box_data['材料']:
-        total.append([item,box_data["材料"][item],box_data['材料單價'][item],box_data['材料成本'][item],])
+    total_title = ["需求量","單價","價格","登記數量","日交易"]
+    for item in box_data['價格']:
+        if item in Cook.npc_items:
+            item_type = 'NPC'
+        elif item == '總計':
+            item_type = ''
+        else:
+            item_type = '交易所'
+        value_list = [item_type,item,]
+        for value in total_title:
+            value_list.append(box_data[value].get(item,''))
+
+        total.append(value_list)
 
     summary = {}
     for item in box_data:
-        if type(box_data[item]) != dict:
+        if type(box_data[item]) in (str,int,float):
             summary[item] = box_data[item]
 
-    return render_template('cook/detail.html', form=form,data=data,data_title=data_title,name=name,total=total,summary=summary)
+    return render_template('cook/detail.html', form=form,data=data,data_title=data_title,name=name,total=total,total_title=total_title,summary=summary)
 
-def cookTable(cook,data,columes):
+def cookTable(data):
+    import string
     table = []
-    for item in data:
-        child_cook = None
-        if '材料' in data[item]:
-            child_cook = item
-            child_data = data[item].pop('材料')
-        row = [cook,item]
-        for key in columes:
-            row.append(data[item].get(key,''))
-        table.append(row)
-        if child_cook:
-            child_table = cookTable(child_cook,child_data,columes)
-            table += child_table
+    n = 0
+    for line in data:
+        base_info = "{}:{} 材料份數:{} 產物 普通({})".format(string.ascii_lowercase[n],line["料理"],line["料理次數"],line['普通'])
+        n += 1
+        if "特製" in line:
+            base_info += " 特製({})".format(line["特製"])
+        if "裝箱數" in line:
+            base_info += " 裝箱數({})".format(line["裝箱數"])
+        if line["上級料理"]:
+            base_info += "上級料理: "+line["上級料理"]
+        for item in line['材料']:
+            row = [base_info,item]
+            for key in ("數量",):
+                row.append(line['材料'][item].get(key,''))
+        
+            table.append(row)
     return table
