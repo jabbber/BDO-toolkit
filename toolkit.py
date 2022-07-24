@@ -30,9 +30,10 @@ def cook():
         if form.validate_on_submit():
             data = {}
             box_data = {}
-            for target in Cook.SUPPORTS:
-                box_data[target] = Cook.boxData(target,form.count.data,form.skill.data,form.tribute_skill.data)
-                data[target] = {title:box_data[target][title] for title in data_title}
+            for target in Cook.recipe:
+                if Cook.recipe[target].get('support'):
+                    box_data[target] = Cook.boxData(target,form.count.data,form.skill.data,form.tribute_skill.data)
+                    data[target] = {title:box_data[target][title] for title in data_title}
         else:
             redirect(url_for('toolkit.cookSubmit'))
 
@@ -43,8 +44,9 @@ def cook():
         if formdata:
             form.validate()
         data = {}
-        for target in Cook.SUPPORTS:
-            data[target] = {title:"" for title in data_title}
+        for target in Cook.recipe:
+            if Cook.recipe[target].get('support'):
+                data[target] = {title:"" for title in data_title}
     return render_template('cook/result.html', form=form,data=data,data_title=data_title)
 
 @bp.route('/cook/submit', methods=('GET', 'POST'))
@@ -58,7 +60,7 @@ def cookSubmit():
 
 @bp.route('/cook/<name>',methods=('GET','POST'))
 def cookDetail(name):
-    if name in Cook.SUPPORTS:
+    if Cook.recipe.get(name,{}).get('support'):
         pass
     else:
         redirect(url_for('toolkit.cook'))

@@ -5,14 +5,16 @@ import os.path
 import yaml
 #import yaml
 # get market price and calculate
-from market_api import Market
+from .market_api import Market
 
-def recipe():
+def readRecipe():
     current_dir = pathlib.Path(__file__).parent.resolve()
     recipe_meta = os.path.join(current_dir,'recipe.yaml')
     with open(recipe_meta, "r") as stream:
         recipe_data = yaml.safe_load(stream)
     return recipe_data
+
+recipe=readRecipe()
 
 box_price={
     '專家': 120000,
@@ -153,7 +155,7 @@ def calMaterial(target,count,skill,tribute_skill,level=0):
 
     market_api = Market()
     price_data = market_api.priceData('TW-tw')
-    material = recipe()[target]['material']
+    material = recipe[target]['material']
     output = {}
     for item in material:
         #單次材料數量
@@ -170,10 +172,10 @@ def calMaterial(target,count,skill,tribute_skill,level=0):
         }
 
         #次級料理
-        if item in recipe():
+        if item in recipe:
             # 反推需要多少次料理
             cook_rate = product/material[item]
-            if not 'box' in recipe()[item]:
+            if not 'box' in recipe[item]:
                 # 特製可以代替3普通做材料,所以消耗量是除以3取整
                 cook_rate += special/math.ceil(material[item]/3)
             cook_count = round(count/cook_rate)
@@ -186,16 +188,16 @@ def calMaterial(target,count,skill,tribute_skill,level=0):
         "料理次數":count,
         "普通": round(product*count,2),
     }
-    if 'special' in recipe()[target]:
+    if 'special' in recipe[target]:
         result["特製"] = round(special*count,2)
     ""
-    if 'box' in recipe()[target]:
-        box,food_count = recipe()[target]['box']
+    if 'box' in recipe[target]:
+        box,food_count = recipe[target]['box']
         box_count = 0
         # 只有第0層普通產物可以裝箱，其他普通產物需要當材料
         if level == 0:
             box_count = result['普通']/food_count
-        if 'special' in recipe()[target]:
+        if 'special' in recipe[target]:
             box_count += result['特製']*3/food_count
         result[box+'箱'] = round(box_count,2)
 
@@ -226,11 +228,11 @@ def boxData(target,count,skill,tribute_skill=0):
 
     # 單次料理產量
     product_count = product
-    if 'special'in recipe()[target]:
+    if 'special'in recipe[target]:
         product_count = product+special*3
 
     # 反推料理次數
-    box,food_count = recipe()[target]['box']
+    box,food_count = recipe[target]['box']
     total_price = round(box_price[box]*box_addition*count,2)
     cook_count = round(count*food_count/product_count)
 
@@ -248,8 +250,8 @@ def boxData(target,count,skill,tribute_skill=0):
     box_data["總利潤"] = round((box_data['納貢收入'] - box_data['成本']))
     box_data["單箱利潤"] = round((box_data['納貢收入'] - box_data['成本'])/count)
     buy_price = price_data[target]['BasePrice']*food_count
-    if 'special' in recipe()[target]:
-        buy_price = price_data[recipe()[target]['special']]['BasePrice']*food_count/3
+    if 'special' in recipe[target]:
+        buy_price = price_data[recipe[target]['special']]['BasePrice']*food_count/3
     box_data["買入裝箱利潤"] = round(box_price[box]*box_addition-buy_price)
     final_cook_count = counter(data,'料理次數')["總計"]
     box_data['消耗耐久'] = round(durability(final_cook_count,skill),2)
@@ -293,4 +295,4 @@ def counter(data,key,target='main',skip_mid=False,total=True):
 
 if __name__ == '__main__':
     #print(yaml.dump(boxData("奧迪爾利塔套餐",204*30,1200,1400),allow_unicode=True,sort_keys=False))
-    print(yaml.dump(recipe(),allow_unicode=True))
+    print(yaml.dump(recipe,allow_unicode=True))
