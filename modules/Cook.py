@@ -259,12 +259,14 @@ def boxData(target,count,skill,tribute_skill=0):
     box_data['魔女湯'] = round(soup(final_cook_count),2)
     box_data["材料"] = counter(data,'數量',skip_mid=True)
     box_data["材料成本"] = counter(data,'價格',skip_mid=True)
-    box_data["材料單價"] = counter(data,'單價',skip_mid=True)
+    box_data["材料單價"] = counter(data,'單價',skip_mid=True,sub_total=False)
     box_data["生產明細"] = data
 
     return box_data
 
-def counter(data,key,target='main',skip_mid=False,total=True):
+def counter(data,key,target='main',skip_mid=False,total=True,sub_total=True):
+    # skip_mid 不累計迭代項
+    # sub_total 不累計數量
     out = {}
     if total:
         out["總計"] = 0
@@ -274,13 +276,16 @@ def counter(data,key,target='main',skip_mid=False,total=True):
     for item in data["材料"]:
         value = data["材料"][item]
         if "材料" in value:
-            mid_out = counter(value,key,target='',skip_mid=skip_mid,total=False)
+            mid_out = counter(value,key,target='',skip_mid=skip_mid,total=False,sub_total=sub_total)
             for mid_key in mid_out:
                 if mid_key == "總計":
                     continue
                 if not mid_key in out:
                     out[mid_key] = 0
-                out[mid_key] += mid_out[mid_key]
+                if sub_total:
+                    out[mid_key] += mid_out[mid_key]
+                else:
+                    out[mid_key] = mid_out[mid_key]
             if skip_mid:
                 continue
         if key in value:
