@@ -203,7 +203,7 @@ def calMaterial(target,count,skill,tribute_skill,level=0):
 
         # 納貢加成
         skill_point = int(tribute_skill/50)*50
-        skill_addition = skill_addition_map[tribute_skill]
+        skill_addition = skill_addition_map[skill_point]
         box_addition = 2.5+skill_addition["皇室納貢增加額外金額"]
 
         result["納貢收入"] = round(box_count*box_price[box]*box_addition)
@@ -219,7 +219,7 @@ def boxData(target,count,skill,tribute_skill=0):
 
     # 納貢價格
     skill_point = int(tribute_skill/50)*50
-    skill_addition = skill_addition_map[tribute_skill]
+    skill_addition = skill_addition_map[skill_point]
     box_addition = 2.5+skill_addition["皇室納貢增加額外金額"]
     # 產物數量
     product=productivity(skill,4)
