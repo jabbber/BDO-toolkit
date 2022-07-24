@@ -132,7 +132,7 @@ def durability(count,skill):
     #(1-發動大量料理機率)*1+(發動大量料理機率*10)
     #另外料理耗時就等於耐久度消耗*料理秒數
     skill_point = int(skill/50)*50
-    skill_addition = skill_addition_map[skill]
+    skill_addition = skill_addition_map[skill_point]
     return count/((1-skill_addition["發動大量料理幾率"])*1+skill_addition["發動大量料理幾率"]*10)
 
 # 魔女湯
