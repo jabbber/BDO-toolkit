@@ -175,7 +175,7 @@ def calMaterial(target,count,skill,tribute_skill,level=0):
         if item in recipe:
             # 反推需要多少次料理
             cook_rate = product/material[item]
-            if not 'box' in recipe[item]:
+            if not 'box' in recipe[item] and 'special' in recipe[item]:
                 # 特製可以代替3普通做材料,所以消耗量是除以3取整
                 cook_rate += special/math.ceil(material[item]/3)
             cook_count = round(count/cook_rate)
