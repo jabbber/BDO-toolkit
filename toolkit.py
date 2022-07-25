@@ -79,7 +79,7 @@ def cookDetail(name):
             form.validate()
     box_data = Cook.boxData(name,form.count.data,form.skill.data,form.tribute_skill.data)
     data = cookTable(box_data["生產明細"])
-    data_title = ["料理","材料","數量"]
+    data_title = ["料理","材料","數量","單價","價格","登記數量","日交易"]
 
     total = []
     total_title = ["需求量","單價","價格","登記數量","日交易"]
@@ -118,7 +118,7 @@ def cookTable(data):
             base_info += "上級料理: "+line["上級料理"]
         for item in line['材料']:
             row = [base_info,item]
-            for key in ("數量",):
+            for key in ("數量","單價","價格","登記數量","日交易"):
                 row.append(line['材料'][item].get(key,''))
         
             table.append(row)
