@@ -39,6 +39,7 @@
   special: 特製巴雷諾斯套餐
   support: True
 戴羅提亞布丁:
+  support: True
   box:
   - 名匠
   - 18
@@ -123,6 +124,7 @@
     鬆軟的麵包: 2
   special: 高級艾亦爾三明治
 蕨菜炒肉:
+  support: True
   box:
   - 名匠
   - 18
@@ -309,6 +311,7 @@
   - 道人
   - 15
 暗黑布丁:
+  support: True
   material:
     燕麥片: 1
     醃製蔬菜: 1
