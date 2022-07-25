@@ -296,9 +296,9 @@ def counter(data,key,sub=False,skip_child=True,total=True,sub_total=True):
             for item in line["材料"]:
                 if skip_child and item in recipe:
                     # 標記為buy的料理做為材料直接買
-                    if not recipe[item].get('buy'):
+                    if not 'buy' in recipe[item]:
                         continue
-                if key in line["材料"][item] and not recipe[line["料理"]].get('buy'):
+                if key in line["材料"][item] and not 'buy' in recipe[line["料理"]]:
                     value = line["材料"][item][key]
                     if not item in out:
                         out[item] = value

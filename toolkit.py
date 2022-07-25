@@ -116,6 +116,8 @@ def cookTable(data):
             base_info += " 裝箱數({})".format(line["裝箱數"])
         if line["上級料理"]:
             base_info += "上級料理: "+line["上級料理"]
+        if 'buy' in Cook.recipe[line["料理"]]:
+            base_info += " (成本用成品計算，材料未計算) 建議: {}".format(Cook.recipe[line["料理"]]['buy'])
         for item in line['材料']:
             row = [base_info,item]
             for key in ("數量","單價","價格","登記數量","日交易"):
