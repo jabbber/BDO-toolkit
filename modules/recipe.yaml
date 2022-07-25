@@ -96,6 +96,7 @@
     鯛魚乾: 1
     鹽: 2
   special: 特製煙燻魚排
+  buy: True
 燕麥片:
   material:
     牛奶: 3
