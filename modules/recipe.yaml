@@ -106,6 +106,7 @@
     食用蜂蜜: 2
   special: 精製的燕麥片
 肉丸子:
+  support: True
   box:
   - 名匠
   - 18
@@ -143,6 +144,7 @@
     食用蜂蜜: 3
   special: 刺激的蜂蜜酒
 起司焗烤:
+  support: True
   box:
   - 名匠
   - 18
