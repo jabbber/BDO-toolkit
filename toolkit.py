@@ -18,7 +18,7 @@ else:
 bp = Blueprint('toolkit', __name__, url_prefix=url_path)
 
 class CookForm(FlaskForm):
-    count = fields.IntegerField('目标箱数', [validators.NumberRange(1,10000,"差不多得了啊，只能输入%(min)-%(max)"),],default=200)
+    count = fields.IntegerField('目标箱数', [validators.NumberRange(1,50000,"差不多得了啊，只能输入%(min)-%(max)"),],default=200)
     skill = fields.IntegerField('熟练度', [validators.NumberRange(0,2000,"差不多得了啊，只能输入%(min)-%(max)"),],default=1000)
     tribute_skill = fields.IntegerField('纳贡熟练度', [validators.NumberRange(0,2000,"差不多得了啊，只能输入%(min)-%(max)"),],default=1200)
 
@@ -35,12 +35,12 @@ def cook():
                     box_data[target] = Cook.boxData(target,form.count.data,form.skill.data,form.tribute_skill.data)
                     data[target] = {title:box_data[target].get(title,'') for title in data_title}
         else:
-            redirect(url_for('toolkit.cookSubmit'))
+            redirect(url_for('toolkit.cook'))
 
     if request.method == 'GET':
         formdata = session.get('formdata', None)
         if not formdata:
-            redirect(url_for('toolkit.cookSubmit'))
+            redirect(url_for('toolkit.cook'))
         if formdata:
             form.validate()
         data = {}
