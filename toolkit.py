@@ -108,7 +108,7 @@ def cookTable(data):
     table = []
     n = 0
     for line in data:
-        base_info = "{}:{} 材料份數:{} 產物 普通({})".format(string.ascii_lowercase[n],line["料理"],line["料理次數"],line['普通'])
+        base_info = "{}:{} 材料份數:{} 耗时(分):{} 產物 普通({})".format(string.ascii_lowercase[n],line["料理"],line["料理次數"],line['耗時(分)'],line['普通'])
         n += 1
         if "特製" in line:
             base_info += " 特製({})".format(line["特製"])

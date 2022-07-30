@@ -178,9 +178,11 @@ def calMaterial(target,count,skill,tribute_skill,parent=""):
     base_info = {
         "料理":target,
         "料理次數":count,
+        "耐久消耗":round(durability(count,skill),2),
         "上級料理":parent,
         "普通": round(product*count,2),
     }
+    base_info['耗時(分)'] = round(base_info['耐久消耗']*1.2/60,1)
     if 'special' in recipe[target]:
         base_info["特製"] = round(special*count,2)
     ""
