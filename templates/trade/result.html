@@ -1,0 +1,42 @@
+{% extends 'trade/base.html' %}
+
+{% block scripts %}
+  <script>
+    $(document).ready(function () {
+        $('#result').DataTable();
+    });
+  </script>
+{% endblock %}
+
+{% block result %}
+
+<table id="result" class="display" style="width:100%">
+  <thead>
+    <tr>
+      <th>箱子</th>
+      {% for item in data_title %}
+      <th>{{ item }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for key,value in data.items() %}
+    <tr>
+      <td><a href="{{ url_for('toolkit.tradeDetail',name=key) }}">{{ key }}</a></td>
+      {% for item in data_title %}
+      <td>{{ value[item] }}</td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <th>箱子</th>
+      {% for item in data_title %}
+      <th>{{ item }}</th>
+      {% endfor %}
+    </tr>
+  </tfoot>
+</table>
+
+{% endblock %}
