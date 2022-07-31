@@ -5,7 +5,7 @@ from flask import (
 from flask_wtf import FlaskForm
 from wtforms import fields,validators
 
-from .modules import Cook
+from .modules import Cook,Trade
 
 import json
 import os
@@ -42,21 +42,13 @@ def cook():
         if not formdata:
             redirect(url_for('toolkit.cook'))
         if formdata:
-            form.validate()
+            if not form.validate():
+                redirect(url_for('toolkit.cook'))
         data = {}
         for target in Cook.recipe:
             if Cook.recipe[target].get('support'):
                 data[target] = {title:"" for title in data_title}
     return render_template('cook/result.html', form=form,data=data,data_title=data_title)
-
-@bp.route('/cook/submit', methods=('GET', 'POST'))
-def cookSubmit():
-    form = CookForm()
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            redirect(url_for('toolkit.cook'))
-
-    return render_template('cook/base.html', form=form)
 
 @bp.route('/cook/<name>',methods=('GET','POST'))
 def cookDetail(name):
@@ -125,3 +117,79 @@ def cookTable(data):
         
             table.append(row)
     return table
+
+class TradeForm(FlaskForm):
+    count = fields.IntegerField('目标箱数', [validators.NumberRange(1,10000,"差不多得了啊，只能输入%(min)-%(max)"),],default=1)
+    level = fields.SelectField('貿易等級', choices=Trade.level_map,coerce=int,default=60)
+    level_num = fields.IntegerField('等級數', [validators.NumberRange(1,50,"差不多得了啊，只能输入%(min)-%(max)"),],default=1)
+    location = fields.SelectField('裝箱地', choices=Trade.distance_map,coerce=float,default=0.9428)
+
+@bp.route('/trade', methods=('GET', 'POST'))
+def trade():
+    form = TradeForm()
+    data_title = ["數量","原價","總價","原料售價","加工利潤","裝箱利潤","買原料加工利潤","買原料裝箱利潤","買加工品裝箱利潤"]
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            data = {}
+            box_data = {}
+            for box in Trade.box_map:
+                box_data[box] = Trade.boxData(box,form.count.data,form.level.data,form.level_num.data,form.location.data)
+                data[box] = {title:box_data[box].get(title,'') for title in data_title}
+        else:
+            redirect(url_for('toolkit.trade'))
+
+    if request.method == 'GET':
+        formdata = session.get('formdata', None)
+        if not formdata:
+            redirect(url_for('toolkit.trade'))
+        if formdata:
+            if not form.validate():
+                redirect(url_for('toolkit.trade'))
+        data = {}
+        for box in Trade.box_map:
+            data[box] = {title:"" for title in data_title}
+    return render_template('trade/result.html', form=form,data=data,data_title=data_title)
+
+@bp.route('/trade/<name>',methods=('GET','POST'))
+def tradeDetail(name):
+    if name in Trade.box_map:
+        pass
+    else:
+        redirect(url_for('toolkit.trade'))
+
+    form = TradeForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            pass
+        else:
+            redirect(url_for('toolkit.trade'))
+    if request.method == 'GET':
+        formdata = session.get('formdata', None)
+        if not formdata:
+            redirect(url_for('toolkit.trade'))
+        if formdata:
+            form.validate()
+    box_data = Trade.boxData(name,form.count.data,form.level.data,form.level_num.data,form.location.data)
+
+    total = []
+    total_title = ["消耗量","單價","預售","日交易","買入價","賣出價"]
+    for item in box_data['材料']:
+        item_type = '加工品'
+        value_list = [item_type,item,]
+        for value in total_title:
+            value_list.append(box_data['材料'][item].get(value,''))
+        total.append(value_list)
+        for base in box_data['材料'][item]['原料']:
+            item_type = '原料'
+            value_list = [item_type,base,]
+            for value in total_title:
+                value_list.append(box_data['材料'][item]['原料'][base].get(value,''))
+            total.append(value_list)
+
+    summary = {}
+    for item in box_data:
+        if type(box_data[item]) in (str,int,float):
+            summary[item] = box_data[item]
+
+    return render_template('trade/detail.html', form=form,total=total,total_title=total_title,name=name,summary=summary)
+
