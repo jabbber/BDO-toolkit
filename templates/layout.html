@@ -10,6 +10,7 @@
   <body>
     <nav>
       <ul>
+        <li><a href="{{ url_for('toolkit.index') }}">HOME</a>
         <li><a href="{{ url_for('toolkit.cook') }}">料理计算器</a>
         <li><a href="{{ url_for('toolkit.trade') }}">貿易裝箱计算器</a>
       </ul>
@@ -18,7 +19,10 @@
       {% for message in get_flashed_messages() %}
         <div class="flash">{{ message }}</div>
       {% endfor %}
-      {% block content %}{% endblock %}
+      {% block content %}
+      <h1>BlackDesert toolkit</h1>
+      <b>普羅旺斯山庄专享</b>
+      {% endblock %}
     </section>
     <div id="footer">
       {% block footer %}

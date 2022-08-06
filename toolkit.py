@@ -17,12 +17,16 @@ else:
 
 bp = Blueprint('toolkit', __name__, url_prefix=url_path)
 
+@bp.route('/', methods=('GET',))
+def index():
+    return render_template('layout.html')
+
 class CookForm(FlaskForm):
     count = fields.IntegerField('目标箱数', [validators.NumberRange(1,50000,"差不多得了啊，只能输入%(min)-%(max)"),],default=200)
     skill = fields.IntegerField('熟练度', [validators.NumberRange(0,2000,"差不多得了啊，只能输入%(min)-%(max)"),],default=1000)
     tribute_skill = fields.IntegerField('纳贡熟练度', [validators.NumberRange(0,2000,"差不多得了啊，只能输入%(min)-%(max)"),],default=1200)
 
-@bp.route('/', methods=('GET', 'POST'))
+@bp.route('/cook', methods=('GET', 'POST'))
 def cook():
     form = CookForm()
     data_title = ["納貢收入","成本","總利潤","單箱利潤","耗時(分)","魔女湯","買入裝箱利潤","成品登記數量","成品日交易","特製登記數量","特製日交易"]
