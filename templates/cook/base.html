@@ -12,8 +12,7 @@
   {% block title %}料理计算器{% endblock %}
 
 {% block content %}
-<form method="POST">
-  {{ form.csrf_token }}
+<form method="GET">
   {{ form.count.label }}
   {{ form.count(size=20) }}
 {% if form.count.errors %}

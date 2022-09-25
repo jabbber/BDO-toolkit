@@ -193,12 +193,14 @@ def calMaterial(target,count,skill,tribute_skill,parent=""):
         if not parent:
             box_count = base_info['普通']/food_count
         # 次級料理如果上級需要1個，且定義了裝箱信息，則進行裝箱，不用來料理
+        price = base_info['普通']*price_data[target]['BasePrice']
         if 'special' in recipe[target]:
             if not parent:
                 box_count += base_info['特製']*3/food_count
             else:
                 if recipe[parent]['material'][target] == 1:
                     box_count += base_info['特製']*3/food_count
+            price += base_info['特製']*price_data[recipe[target]['special']]['BasePrice']
         if box_count > 0:
             base_info['裝箱數'] = round(box_count,2)
             base_info['等級'] = box
@@ -209,6 +211,7 @@ def calMaterial(target,count,skill,tribute_skill,parent=""):
         box_addition = 2.5+skill_addition["皇室納貢增加額外金額"]
 
         base_info["納貢收入"] = round(box_count*box_price[box]*box_addition)
+        base_info["上架收入"] = round(0.85*price)
     base_info["材料"] = output
 
     result.append(base_info)
@@ -262,9 +265,11 @@ def boxData(target,count,skill,tribute_skill=0):
         "目標箱數": count,
         "實際箱數": '|'.join(["{}({})".format(key,value) for key,value in counter(data,'裝箱數').items()]),
         "納貢收入": counter(data,'納貢收入')['總計'],
+        "上架收入": counter(data,'上架收入')['總計'],
         "成本": counter(data,'價格',sub=True)['總計'],
     }
-    box_data["總利潤"] = round((box_data['納貢收入'] - box_data['成本']))
+    box_data["納貢利潤"] = round((box_data['納貢收入'] - box_data['成本']))
+    box_data["上架利潤"] = round((box_data['上架收入'] - box_data['成本']))
     box_data["單箱利潤"] = round((box_data['納貢收入'] - box_data['成本'])/count)
     buy_price = price_data[target]['BasePrice']*food_count
     box_data["成品登記數量"] = price_data[target]['Count']

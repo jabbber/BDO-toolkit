@@ -22,7 +22,7 @@
   <tbody>
     {% for key,value in data.items() %}
     <tr>
-      <td><a href="{{ url_for('toolkit.cookDetail',name=key) }}">{{ key }}</a></td>
+      <td><a href="{{ url_for('toolkit.cookDetail',name=key) }}" target="_blank">{{ key }}</a></td>
       {% for item in data_title %}
       <td>{{ value[item] }}</td>
       {% endfor %}

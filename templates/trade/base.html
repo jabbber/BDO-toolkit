@@ -12,8 +12,7 @@
   {% block title %}貿易裝箱计算器{% endblock %}
 
 {% block content %}
-<form method="POST">
-  {{ form.csrf_token }}
+<form method="GET">
   {{ form.count.label }}
   {{ form.count() }}
 {% if form.count.errors %}
