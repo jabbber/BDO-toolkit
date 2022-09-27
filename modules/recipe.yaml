@@ -479,3 +479,12 @@
   box:
   - 名匠
   - 21
+焦糖紅蘿蔔:
+  material:
+    特等紅蘿蔔: 2
+    黑糖塊: 3
+    鹽: 2
+    肉桂: 4
+    料理用飲用水: 6
+  support: true
+  support: true
