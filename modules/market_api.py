@@ -72,7 +72,7 @@ class Market:
                     f.write(out)
         data = {}
         for line in out.split('\n'):
-            name,index,count,total_trades,base_price,daily_volume = line.split('\t')
+            name,index,count,total_trades,base_price,daily_volume,enhance_level = line.split('\t')
             data[name] = {
                 'Name': name,
                 'Index': index,
@@ -80,6 +80,7 @@ class Market:
                 'TotalTrades': int(total_trades),
                 'BasePrice': int(base_price),
                 'DailyVolume': int(daily_volume),
+                'EnhanceLevel': int(enhance_level),
                 }
         return data
 
