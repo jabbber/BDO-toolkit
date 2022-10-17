@@ -82,6 +82,15 @@ class Market:
                 'DailyVolume': int(daily_volume),
                 'EnhanceLevel': int(enhance_level),
                 }
+            # 根據供需關係，售價需要+-7.5%取整,0預售的頂價，日交易*10<預售的底價
+            if data[name]['BasePrice'] < 1000:
+                shift = -1
+            elif data[name]['BasePrice'] > 1000:
+                shift = -2
+            if data[name]['Count'] == 0:
+                data[name]['BasePrice'] = round(data[name]['BasePrice']*1.075,-2)
+            elif data[name]['DailyVolume']*10 < data[name]['Count']:
+                data[name]['BasePrice'] = round(data[name]['BasePrice']*0.925,-2)
         return data
 
 

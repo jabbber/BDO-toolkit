@@ -119,7 +119,7 @@ class TradeForm(FlaskForm):
 
 @bp.route('/trade', methods=('GET',))
 def trade():
-    data_title = ["數量","原價","總價","原料售價","加工利潤","裝箱利潤","買原料加工利潤","買原料裝箱利潤","買加工品裝箱利潤"]
+    data_title = ["數量","箱價","瓦倫售價","原料售價","加工利潤","裝箱利潤","買原料加工利潤","買原料裝箱利潤","買成品裝箱利潤"]
     data = {}
     for box in Trade.box_map:
         data[box] = {title:"" for title in data_title}
