@@ -64,30 +64,30 @@ box_price = {
 
 # 加工材料配比，粗略計算,實際有跳階會更多
 base_map = {
-    "鋼鐵":{"鐵礦石":4,"煤炭":2},
-    "青銅鑄塊":{"銅礦石":4,"錫礦石":4},
-    "黃銅鑄塊":{"銅礦石":4,"鋅礦石":4},
-    "釩鑄塊":{"釩礦石":8},
-    "鈦鑄塊":{"鈦礦石":8},
-    "金鑄塊":{"金礦石":8},
-    "銀鑄塊":{"銀礦石":8},
-    "白金鑄塊":{"白金礦石":8},
-    "深銀鑄塊":{"深銀":8},
-    "翡翠":{"翡翠原石":4},
-    "綠鑄塊":{"綠礦石":8},
-    "黑曜石":{"黑曜石原石":4},
-    "鎳錠":{"鎳礦石":8},
-    "楓樹合板":{"楓樹原木":8},
-    "松樹合板":{"松樹原木":8},
-    "扁柏樹合板":{"扁柏樹原木":8},
-    "洋槐樹合板":{"洋槐樹原木":8},
-    "白樺樹合板":{"白樺樹原木":8},
-    "冷杉樹合板":{"冷杉樹原木":8},
-    "杉樹合板":{"杉樹原木":8},
-    "雪原杉樹合板":{"雪原杉樹原木":8},
-    "刺樹合板":{"刺樹原木":8},
-    "側柏合板":{"側柏原木":8},
-    "黑石粉末":{"黑石(武器)":0.0125},
+    "鋼鐵":[{"鐵礦石":4,"煤炭":1.25,},{"熔化的鐵碎片":1.25,"煤炭":1.25,}],
+    "青銅鑄塊":[{"銅礦石":4,"錫礦石":4},{"熔化的銅塊":1.25,"熔化的錫塊":1.25}],
+    "黃銅鑄塊":[{"銅礦石":4,"鋅礦石":4},{"熔化的銅塊":1.25,"熔化的鋅塊":1.25}],
+    "釩鑄塊":[{"釩礦石":8},{"熔化的釩碎片":2.5}],
+    "鈦鑄塊":[{"鈦礦石":8},{"熔化的鈦碎片":2.5}],
+    "金鑄塊":[{"金礦石":8},{"熔化的黃金碎片":2.5}],
+    "銀鑄塊":[{"銀礦石":8},{"熔化的銀塊":2.5}],
+    "白金鑄塊":[{"白金礦石":8},{"熔化的白金碎片":2.5}],
+    "深銀鑄塊":[{"深銀":8},{"熔化的深銀碎片":2.5}],
+    "翡翠":[{"翡翠原石":4},{"翡翠原石":4}],
+    "綠鑄塊":[{"綠礦石":8},{"熔化的綠碎片":2.5}],
+    "黑曜石":[{"黑曜石原石":4},{"黑曜石原石":4}],
+    "鎳錠":[{"鎳礦石":8},{"熔化的鎳碎片":2.5}],
+    "楓樹合板":[{"楓樹原木":8},{"楓樹木板":2.5}],
+    "松樹合板":[{"松樹原木":8},{"松樹木板":2.5}],
+    "扁柏樹合板":[{"扁柏樹原木":8},{"扁柏樹木板":2.5}],
+    "洋槐樹合板":[{"洋槐樹原木":8},{"洋槐樹木板":2.5}],
+    "白樺樹合板":[{"白樺樹原木":8},{"白樺樹木板":2.5}],
+    "冷杉樹合板":[{"冷杉樹原木":8},{"冷杉樹木板":2.5}],
+    "杉樹合板":[{"杉樹原木":8},{"杉樹木板":2.5}],
+    "雪原杉樹合板":[{"雪原杉樹原木":8},{"雪原杉樹木板":2.5}],
+    "刺樹合板":[{"刺樹原木":8},{"刺樹木板":2.5}],
+    "側柏合板":[{"側柏原木":8},{"側柏木板":2.5}],
+    "黑石粉末":[{"黑石(武器)":0.0125},{"黑石(武器)":0.0125}],
 }
 
 def boxData(box,count,level,level_num,distence):
@@ -107,14 +107,17 @@ def boxData(box,count,level,level_num,distence):
 
     total_cost = 0
     total_base_cost = 0
+    total_semi_cost = 0
     item_data = {}
     for item in box_map[box]:
         item_count = box_map[box][item]*count
         item_cost = price_data[item]['BasePrice']*item_count
+
+        # c初級原料
         base_cost = 0
         base_data = {}
-        for base in base_map[item]:
-            base_count = base_map[item][base]*item_count
+        for base in base_map[item][0]:
+            base_count = base_map[item][0][base]*item_count
             base_cost += price_data[base]['BasePrice']*base_count
             base_data[base] = {
                 "消耗量":base_count,
@@ -123,6 +126,21 @@ def boxData(box,count,level,level_num,distence):
                 "日交易":price_data[base]['DailyVolume'],
                 "買入價":base_cost,
                 "賣出價":round(base_cost*tax),
+            }
+
+        # 二級原料
+        semi_cost = 0
+        semi_data = {}
+        for semi in base_map[item][1]:
+            semi_count = base_map[item][1][semi]*item_count
+            semi_cost += price_data[semi]['BasePrice']*semi_count
+            semi_data[semi] = {
+                "消耗量":semi_count,
+                "單價":price_data[semi]['BasePrice'],
+                "預售":price_data[semi]['Count'],
+                "日交易":price_data[semi]['DailyVolume'],
+                "買入價":semi_cost,
+                "賣出價":round(semi_cost*tax),
             }
 
         cost = price_data[item]['BasePrice']*item_count
@@ -138,16 +156,19 @@ def boxData(box,count,level,level_num,distence):
             "買入價":cost,
             "賣出價":round(cost*tax),
             "原料":base_data,
+            "半成品": semi_data,
         }
         total_cost += cost
         total_base_cost += base_cost
-    data["材料"] = item_data
+        total_semi_cost += semi_cost
+    data["成品"] = item_data
     data["原料售價"] = round(total_base_cost*tax)
     data["加工利潤"] = round((total_cost-total_base_cost)*tax)
     data["裝箱利潤"] = round(final_price-total_base_cost*tax)
-    data["買原料加工利潤"] = round(total_cost*tax-total_base_cost)
-    data["買原料裝箱利潤"] = final_price-total_base_cost
-    data["買成品裝箱利潤"] = final_price-total_cost
+    data["買原料加工"] = round(total_cost*tax-total_base_cost)
+    data["買原料裝箱"] = final_price-total_base_cost
+    data["買半成品裝箱"] = final_price-total_semi_cost
+    data["買成品裝箱"] = final_price-total_cost
 
     return data
 

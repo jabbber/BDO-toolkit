@@ -119,7 +119,7 @@ class TradeForm(FlaskForm):
 
 @bp.route('/trade', methods=('GET',))
 def trade():
-    data_title = ["數量","箱價","瓦倫售價","原料售價","加工利潤","裝箱利潤","買原料加工利潤","買原料裝箱利潤","買成品裝箱利潤"]
+    data_title = ["數量","箱價","瓦倫售價","原料售價","加工利潤","裝箱利潤","買原料加工","買原料裝箱","買半成品裝箱","買成品裝箱"]
     data = {}
     for box in Trade.box_map:
         data[box] = {title:"" for title in data_title}
@@ -151,17 +151,23 @@ def tradeDetail(name):
 
     total = []
     total_title = ["消耗量","單價","預售","日交易","買入價","賣出價"]
-    for item in box_data['材料']:
-        item_type = '加工品'
+    for item in box_data['成品']:
+        item_type = '成品'
         value_list = [item_type,item,]
         for value in total_title:
-            value_list.append(box_data['材料'][item].get(value,''))
+            value_list.append(box_data['成品'][item].get(value,''))
         total.append(value_list)
-        for base in box_data['材料'][item]['原料']:
+        for base in box_data['成品'][item]['原料']:
             item_type = '原料'
             value_list = [item_type,base,]
             for value in total_title:
-                value_list.append(box_data['材料'][item]['原料'][base].get(value,''))
+                value_list.append(box_data['成品'][item]['原料'][base].get(value,''))
+            total.append(value_list)
+        for base in box_data['成品'][item]['半成品']:
+            item_type = '半成品'
+            value_list = [item_type,base,]
+            for value in total_title:
+                value_list.append(box_data['成品'][item]['半成品'][base].get(value,''))
             total.append(value_list)
 
     summary = {}
