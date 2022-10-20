@@ -87,7 +87,7 @@ class Market:
                 shift = -1
             elif data[name]['BasePrice'] > 1000:
                 shift = -2
-            if data[name]['Count'] == 0:
+            if data[name]['Count'] == 0 and data[name]['DailyVolume'] < 150000:
                 data[name]['BasePrice'] = round(data[name]['BasePrice']*1.075,-2)
             elif data[name]['DailyVolume'] > data[name]['Count']*10:
                 data[name]['BasePrice'] = round(data[name]['BasePrice']*1.075,-2)
