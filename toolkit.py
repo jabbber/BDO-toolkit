@@ -22,7 +22,7 @@ def index():
     return render_template('layout.html')
 
 class CookForm(FlaskForm):
-    count = fields.IntegerField('目标箱数', [validators.NumberRange(1,50000,"差不多得了啊，只能输入%(min)-%(max)"),],default=1)
+    count = fields.IntegerField('目标箱数', [validators.NumberRange(1,100000,"差不多得了啊，只能输入%(min)-%(max)"),],default=1)
     skill = fields.IntegerField('熟练度', [validators.NumberRange(0,2000,"差不多得了啊，只能输入%(min)-%(max)"),],default=1200)
     tribute_skill = fields.IntegerField('纳贡熟练度', [validators.NumberRange(0,2000,"差不多得了啊，只能输入%(min)-%(max)"),],default=1400)
     class Meta:
@@ -110,7 +110,7 @@ def cookTable(data):
     return table
 
 class TradeForm(FlaskForm):
-    count = fields.IntegerField('目标箱数', [validators.NumberRange(1,10000,"差不多得了啊，只能输入%(min)-%(max)"),],default=1)
+    count = fields.IntegerField('目标箱数', [validators.NumberRange(1,1000000,"差不多得了啊，只能输入%(min)-%(max)"),],default=1)
     level = fields.SelectField('貿易等級', choices=Trade.level_map,coerce=int,default=60)
     level_num = fields.IntegerField('等級數', [validators.NumberRange(1,50,"差不多得了啊，只能输入%(min)-%(max)"),],default=1)
     location = fields.SelectField('裝箱地', choices=Trade.distance_map,coerce=float,default=0.9428)
