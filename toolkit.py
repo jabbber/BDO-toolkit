@@ -113,7 +113,7 @@ class TradeForm(FlaskForm):
     count = fields.IntegerField('目标箱数', [validators.NumberRange(1,1000000,"差不多得了啊，只能输入%(min)-%(max)"),],default=1)
     level = fields.SelectField('貿易等級', choices=Trade.level_map,coerce=int,default=60)
     level_num = fields.IntegerField('等級數', [validators.NumberRange(1,50,"差不多得了啊，只能输入%(min)-%(max)"),],default=1)
-    location = fields.SelectField('裝箱地', choices=Trade.distance_map,coerce=float,default=0.9428)
+    location = fields.SelectField('裝箱地', choices=Trade.distance_map,coerce=float,default=1.5)
     class Meta:
         csrf = False
 
